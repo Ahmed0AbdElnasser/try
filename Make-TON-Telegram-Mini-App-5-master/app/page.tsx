@@ -23,6 +23,8 @@ export default function Home() {
 
       const initData = tg.initData || ''
       const initDataUnsafe = tg.initDataUnsafe || {}
+      const urlParams = new URLSearchParams(window.location.search);
+      const refId = urlParams.get('ref'); // الحصول على معرف الشخص المدعو من رابط الدعوة
 
       if (initDataUnsafe.user) {
         const userData = {
@@ -31,6 +33,13 @@ export default function Home() {
           points: 0,       // نقاط المستخدم
           pointsRequired: 1000, // النقاط المطلوبة
         };
+
+        // إذا كان هناك معرف في رابط الدعوة، يجب زيادة عدد المدعوين
+        if (refId) {
+          userData.invitedCount = 1; // زيادة العدد بمقدار 1
+          // هنا يمكن أن تضيف منطق لتحديث المدعو (الشخص الذي دعا هذا المستخدم) في قاعدة البيانات
+          // على سبيل المثال: await updateInviter(refId);
+        }
 
         fetch('/api/user', {
           method: 'POST',
@@ -62,7 +71,6 @@ export default function Home() {
   const handleIncreasePoints = async () => {
     if (!user) return
 
-    // تحقق مما إذا كان المستخدم قد حقق النقاط المطلوبة
     if (user.points < user.pointsRequired) {
       setError(`You need to click ${user.pointsRequired} times to increase your points.`);
       return;
@@ -78,11 +86,9 @@ export default function Home() {
       })
       const data = await res.json()
       if (data.success) {
-        // زيادة النقاط
         setUser({ ...user, points: data.points });
         setNotification('Points increased successfully!');
 
-        // تحقق من عدد الأشخاص الذين تم دعوتهم
         if (user.invitedCount >= 10) {
           setNotification('Congratulations! You can withdraw your $5!');
         }
