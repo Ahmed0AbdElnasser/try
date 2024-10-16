@@ -8,15 +8,12 @@ generator client {
 }
 
 model User {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId     Int      @unique
-  username        String?
-  firstName      String?
-  lastName       String?
-  points         Int      @default(0)
-  invitedCount   Int      @default(0) // عدد الأشخاص المدعوين
-  inviteLink     String?  // رابط الدعوة الفريد
-  pointsRequired  Int      @default(10) // عدد النقاط المطلوبة للسحب، يمكنك تعديله حسب الحاجة
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId Int     @unique
+  username   String?
+  firstName  String?
+  lastName   String?
+  points     Int     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
