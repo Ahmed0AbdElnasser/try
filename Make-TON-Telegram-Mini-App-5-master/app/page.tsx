@@ -23,38 +23,21 @@ export default function Home() {
 
       const initData = tg.initData || ''
       const initDataUnsafe = tg.initDataUnsafe || {}
-      const urlParams = new URLSearchParams(window.location.search);
-      const refId = urlParams.get('ref'); // الحصول على معرف الشخص المدعو من رابط الدعوة
 
       if (initDataUnsafe.user) {
-        const userData = {
-          ...initDataUnsafe.user,
-          invitedCount: 0, // عدد الأشخاص الذين تم دعوتهم
-          points: 0,       // نقاط المستخدم
-          pointsRequired: 1000, // النقاط المطلوبة
-        };
-
-        // إذا كان هناك معرف في رابط الدعوة، يجب زيادة عدد المدعوين
-        if (refId) {
-          userData.invitedCount = 1; // زيادة العدد بمقدار 1
-          // هنا يمكن أن تضيف منطق لتحديث المدعو (الشخص الذي دعا هذا المستخدم) في قاعدة البيانات
-          // على سبيل المثال: await updateInviter(refId);
-        }
-
         fetch('/api/user', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(initDataUnsafe.user),
         })
           .then((res) => res.json())
           .then((data) => {
             if (data.error) {
               setError(data.error)
             } else {
-              setUser(data);
-              alert('You have earned $5! To withdraw it, invite 10 people and press "Increase Points" 1000 times.');
+              setUser(data)
             }
           })
           .catch((err) => {
@@ -71,11 +54,6 @@ export default function Home() {
   const handleIncreasePoints = async () => {
     if (!user) return
 
-    if (user.points < user.pointsRequired) {
-      setError(`You need to click ${user.pointsRequired} times to increase your points.`);
-      return;
-    }
-
     try {
       const res = await fetch('/api/increase-points', {
         method: 'POST',
@@ -86,14 +64,9 @@ export default function Home() {
       })
       const data = await res.json()
       if (data.success) {
-        setUser({ ...user, points: data.points });
-        setNotification('Points increased successfully!');
-
-        if (user.invitedCount >= 10) {
-          setNotification('Congratulations! You can withdraw your $5!');
-        }
-        
-        setTimeout(() => setNotification(''), 3000);
+        setUser({ ...user, points: data.points })
+        setNotification('Points increased successfully!')
+        setTimeout(() => setNotification(''), 3000)
       } else {
         setError('Failed to increase points')
       }
@@ -112,7 +85,6 @@ export default function Home() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Welcome, {user.firstName}!</h1>
       <p>Your current points: {user.points}</p>
-      <p>Your referral link: https://yourapp.com/invite?ref=${user.telegramId}</p>
       <button
         onClick={handleIncreasePoints}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
