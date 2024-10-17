@@ -8,12 +8,14 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId Int     @unique
-  username   String?
-  firstName  String?
-  lastName   String?
-  points     Int     @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId    Int      @unique
+  username      String?
+  firstName     String?
+  lastName      String?
+  points        Int      @default(0)
+  invitedCount  Int      @default(0) // عدد الدعوات
+  referralLink  String?  // رابط الدعوة
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
